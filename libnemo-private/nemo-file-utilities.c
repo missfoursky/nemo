@@ -26,6 +26,7 @@
 #include "nemo-file-utilities.h"
 
 #include "nemo-global-preferences.h"
+#include "nemo-icon-names.h"
 #include "nemo-lib-self-check-functions.h"
 #include "nemo-metadata.h"
 #include "nemo-file.h"
@@ -980,6 +981,44 @@ have_program_in_path (const char *name)
 	return result;
 }
 
+static GIcon *
+special_directory_get_icon (GUserDirectory directory,
+                gboolean symbolic)
+{
+
+#define ICON_CASE(x)                             \
+    case G_USER_DIRECTORY_ ## x:                     \
+        return (symbolic) ? g_themed_icon_new (NEMO_ICON_FOLDER_ ## x) : g_themed_icon_new (NEMO_ICON_FULLCOLOR_FOLDER_ ## x);
+
+    switch (directory) {
+
+        ICON_CASE (DOCUMENTS);
+        ICON_CASE (DOWNLOAD);
+        ICON_CASE (MUSIC);
+        ICON_CASE (PICTURES);
+        ICON_CASE (PUBLIC_SHARE);
+        ICON_CASE (TEMPLATES);
+        ICON_CASE (VIDEOS);
+
+    default:
+        return (symbolic) ? g_themed_icon_new (NEMO_ICON_FOLDER) : g_themed_icon_new (NEMO_ICON_FULLCOLOR_FOLDER);
+    }
+
+#undef ICON_CASE
+}
+
+GIcon *
+nemo_special_directory_get_symbolic_icon (GUserDirectory directory)
+{
+    return special_directory_get_icon (directory, TRUE);
+}
+
+GIcon *
+nemo_special_directory_get_icon (GUserDirectory directory)
+{
+    return special_directory_get_icon (directory, FALSE);
+}
+
 gboolean
 nemo_is_file_roller_installed (void)
 {
@@ -1364,45 +1403,6 @@ nemo_get_cached_x_content_types_for_mount (GMount *mount)
 	}
 
 	return NULL;
-}
-
-gboolean
-nemo_dir_has_children_now (GFile *dir, gboolean *has_subdirs)
-{
-    GFileEnumerator *enumerator;
-    gboolean res;
-    gboolean has_dirs;
-    GFileInfo *file_info;
-
-    res = FALSE;
-    has_dirs = FALSE;
-
-    enumerator = g_file_enumerate_children (dir,
-                        G_FILE_ATTRIBUTE_STANDARD_TYPE,
-                        0,
-                        NULL, NULL);
-    if (enumerator) {
-        do {
-            file_info = g_file_enumerator_next_file (enumerator, NULL, NULL);
-            if (file_info != NULL) {
-                res = TRUE;
-                GFileType type;
-                type = g_file_info_get_attribute_uint32 (file_info, G_FILE_ATTRIBUTE_STANDARD_TYPE);
-                if (type == G_FILE_TYPE_DIRECTORY) {
-                    has_dirs = TRUE;
-                    break;
-                }
-                g_object_unref (file_info);
-            }
-        } while (file_info != NULL);
-        g_file_enumerator_close (enumerator, NULL, NULL);
-        g_object_unref (enumerator);
-    }
-
-    if (has_subdirs != NULL)
-        *has_subdirs = has_dirs;
-
-    return res;
 }
 
 #if !defined (NEMO_OMIT_SELF_CHECK)

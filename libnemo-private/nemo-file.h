@@ -209,6 +209,7 @@ gboolean                nemo_file_is_user_special_directory         (NemoFile   
 									 GUserDirectory                 special_directory);
 gboolean		nemo_file_is_archive			(NemoFile			*file);
 gboolean                nemo_file_is_in_trash                       (NemoFile                   *file);
+gboolean                nemo_file_is_in_recent                      (NemoFile                   *file);
 gboolean                nemo_file_is_in_desktop                     (NemoFile                   *file);
 gboolean		nemo_file_is_home				(NemoFile                   *file);
 gboolean                nemo_file_is_desktop_directory              (NemoFile                   *file);
@@ -456,10 +457,12 @@ GIcon *                 nemo_file_get_gicon                         (NemoFile   
 									 NemoFileIconFlags           flags);
 NemoIconInfo *      nemo_file_get_icon                          (NemoFile                   *file,
 									 int                             size,
+                                     int                             scale,
 									 NemoFileIconFlags           flags);
 GdkPixbuf *             nemo_file_get_icon_pixbuf                   (NemoFile                   *file,
 									 int                             size,
 									 gboolean                        force_size,
+                                     int                             scale,
 									 NemoFileIconFlags           flags);
 
 gboolean                nemo_file_has_open_window                   (NemoFile                   *file);
